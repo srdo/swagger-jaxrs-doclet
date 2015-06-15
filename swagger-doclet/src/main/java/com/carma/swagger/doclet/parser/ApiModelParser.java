@@ -103,6 +103,22 @@ public class ApiModelParser {
 			}
 		}
 		this.models = new LinkedHashSet<Model>();
+		
+                if (rootType.asClassDoc() != null && rootType.asClassDoc().superclass() != null) {
+                        AnnotationParser p = new AnnotationParser(rootType.asClassDoc().superclass(), this.options);
+                        //List<String> subTypes = new ArrayList<String>();
+                        for (String subTypeAnnotation : this.options.getSubTypesAnnotations()) {
+                                List<ClassDoc> annSubTypes = p.getAnnotationArrayTypes(subTypeAnnotation, "value", "value");
+                                if (annSubTypes != null) {
+                                        for (ClassDoc subType : annSubTypes) {
+                                                if (this.translator.typeName(rootType.asClassDoc()).value().equals(this.translator.typeName(subType).value())) {
+                                                        inheritFields = false;
+                                                }
+                                        }
+                                }
+                        }
+                }
+                
                 this.inheritFields = inheritFields;
 	}
 
